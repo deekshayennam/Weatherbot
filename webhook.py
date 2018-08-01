@@ -14,7 +14,7 @@ def webhook():
     req = request.get_json(silent=True, force=True)
     print(json.dumps(req, indent=4))
     
-    res = processRequest(req)
+    res = makeResponse(req)
     
     res = json.dumps(res, indent=4)
     # print(res)
@@ -27,16 +27,14 @@ def makeResponse(req):
     parameters = result.get("parameters")
     city = parameters.get("geo-city")
     date = parameters.get("date")
-    if city is None:
-        return None
-    r=requests.get("api.openweathermap.org/data/2.5/forecast?q=%s,us&appid=771aec2ac270e999b7d321e0d1ffee57" % city) 
+    r=requests.get('http://api.openweathermap.org/data/2.5/forecast?q='+city+'&appid=771aec2ac270e999b7d321e0d1ffee57')
     json_object = r.json()
     weather=json_object['list']
     for i in range(0,30):
         if date in weather[i]['dt_txt']:
             condition= weather[i]['weather'][0]['description']
             break
-    speech = "The forecast for"+city+ "for "+date+" is "+condition
+    speech = "The forecast for"+city+"for "+date+" is "+condition
     return {
     "speech": speech,
     "displayText": speech,
@@ -47,16 +45,6 @@ if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port %d" % port)
     app.run(debug=False, port=port, host='0.0.0.0')
-
-
-
-
-
-
-
-
-
-
 
 
 
