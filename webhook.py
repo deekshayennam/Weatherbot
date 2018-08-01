@@ -1,6 +1,7 @@
 import json
 import os
 import requests
+import dateutil.parser
 
 from flask import Flask
 from flask import request
@@ -27,6 +28,9 @@ def makeResponse(req):
     parameters = result.get("parameters")
     city = parameters.get("geo-city")
     date = parameters.get("date")
+    datetime_obj = dateutil.parser.parse(date)
+    date_formatted=datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+    
     r=requests.get('http://api.openweathermap.org/data/2.5/forecast?q='+city+'&appid=771aec2ac270e999b7d321e0d1ffee57')
     json_object = r.json()
     weather=json_object['list']
@@ -34,7 +38,7 @@ def makeResponse(req):
         if date in weather[i]['dt_txt']:
             condition= weather[i]['weather'][0]['description']
             break
-    speech = "The forecast for"+city+"for "+date+" is "+condition
+    speech = "The forecast for"+city+"for "+date_formatted+" is "+condition
     return {
     "speech": speech,
     "displayText": speech,
